@@ -7,24 +7,17 @@ const MediaItem = ({ item, onAddToTimeline }) => {
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
   const videoRef = useRef(null);
   
-  // Create a fresh blob URL for the video if we have the original file
-  // This ensures we don't run into issues with expired blob URLs
+  // Create a source URL for the video from base64 or direct URL
   const videoSrc = useMemo(() => {
-    if (item.file && item.type === 'video') {
-      return URL.createObjectURL(item.file);
+    if (item.fileData) {
+      // Use the base64 data directly
+      return item.fileData;
+    } else if (item.src) {
+      // Use the provided URL (for sample videos)
+      return item.src;
     }
-    return item.src;
-  }, [item.file, item.src, item.type]);
-  
-  // Clean up the blob URL when component unmounts
-  useEffect(() => {
-    return () => {
-      // Only revoke URLs we created in this component
-      if (item.file && videoSrc) {
-        URL.revokeObjectURL(videoSrc);
-      }
-    };
-  }, [item.file, videoSrc]);
+    return null;
+  }, [item.fileData, item.src]);
   
   // Format duration as MM:SS
   const formatDuration = (seconds) => {
@@ -125,7 +118,7 @@ const MediaItem = ({ item, onAddToTimeline }) => {
   // Handle adding to timeline
   const handleAddToTimeline = async () => {
     setIsAdding(true);
-    console.log("Adding item to timeline:", item);
+    console.log("Adding item to timeline:", item.name);
     
     try {
       // Add a slight delay for visual feedback
