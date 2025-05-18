@@ -350,7 +350,7 @@ const VideoEditor = () => {
 
   // Handle file upload
   const handleFileUpload = async (files) => {
-    console.log("Handling file upload:", files);
+    console.log("Handling file upload:", files.length, "files");
     if (!files || files.length === 0) return;
     
     try {
@@ -373,9 +373,8 @@ const VideoEditor = () => {
                      file.type.startsWith('audio') ? 'audio' : 'image';
           
           try {
-            // Store the file directly without creating a Blob
-            // This avoids the issue with blob URLs becoming invalid
-            const fileUrl = URL.createObjectURL(file);
+            // Convert file to base64 for storage
+            const fileData = await fileToBase64(file);
             
             // Get file metadata
             let duration = 30; // Default duration
@@ -389,19 +388,16 @@ const VideoEditor = () => {
               }
             }
             
-            // Create the media item - store the actual file instead of just metadata
+            // Create the media item - store with base64 data
             const mediaItem = {
               id,
               type,
               name: file.name,
               duration,
-              src: fileUrl,
-              thumbnail: type === 'video' ? fileUrl : null,
+              fileData: fileData, // Store as base64
               fileType: file.type,
               fileSize: file.size,
-              lastModified: file.lastModified,
-              // Store the actual file to prevent garbage collection
-              file: file
+              lastModified: file.lastModified
             };
             
             // Add to media library
@@ -415,9 +411,33 @@ const VideoEditor = () => {
       
       // Update the media library state
       setMediaLibrary(newMediaLibrary);
+      
+      // Save to localStorage
+      saveMediaLibraryToStorage(newMediaLibrary);
+      
       console.log("Media library updated with new items");
     } catch (error) {
       console.error("Error processing uploaded files:", error);
+    }
+  };
+  
+  // Convert file to base64
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+  
+  // Save media library to localStorage
+  const saveMediaLibraryToStorage = (library) => {
+    try {
+      localStorage.setItem('videoEditor_mediaLibrary', JSON.stringify(library));
+      console.log('Saved media library to localStorage:', library.length, 'items');
+    } catch (error) {
+      console.error('Error saving media library to localStorage:', error);
     }
   };
   
