@@ -84,15 +84,7 @@ const VideoEditor = () => {
       if (savedMedia) {
         const parsedMedia = JSON.parse(savedMedia);
         console.log('Loaded media library from localStorage:', parsedMedia.length, 'items');
-        
-        // Filter out any items that would have ObjectURLs but don't anymore
-        // (these would be uploaded videos from previous sessions)
-        const validMedia = parsedMedia.filter(item => {
-          // Keep only sample media items with src or items without src (they'll need re-upload)
-          return (item.src && item.id.startsWith('sample-')) || !item.src;
-        });
-        
-        return validMedia;
+        return parsedMedia;
       }
       return sampleMedia;
     } catch (error) {
