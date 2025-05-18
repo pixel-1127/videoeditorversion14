@@ -130,6 +130,7 @@ const VideoEditor = () => {
 
   // Add clip to timeline
   const addClipToTimeline = (mediaItem) => {
+    console.log("Adding to timeline:", mediaItem.name);
     setProject(prev => {
       // Find the appropriate track for this media type
       const trackIndex = prev.tracks.findIndex(track => track.type === mediaItem.type);
@@ -149,8 +150,9 @@ const VideoEditor = () => {
         name: mediaItem.name,
         start: lastClipEnd,
         duration: mediaItem.duration,
-        src: mediaItem.src,
-        file: mediaItem.file // Keep reference to the file if it exists
+        // Use fileData (base64) if available, otherwise use src (for sample media)
+        fileData: mediaItem.fileData,
+        src: mediaItem.src
       };
       
       // Update the tracks with the new clip
@@ -160,17 +162,18 @@ const VideoEditor = () => {
         clips: [...updatedTracks[trackIndex].clips, newClip]
       };
       
-      // Calculate new duration
-      const newDuration = Math.max(prev.duration, lastClipEnd + mediaItem.duration);
-      
-      console.log(`Added clip "${mediaItem.name}" to ${mediaItem.type} track at position ${lastClipEnd}`);
-      console.log(`New project duration: ${newDuration}`);
+      // Calculate the new project duration
+      const newDuration = Math.max(
+        ...updatedTracks.flatMap(track => 
+          track.clips.map(clip => clip.start + clip.duration)
+        )
+      );
       
       return {
         ...prev,
         tracks: updatedTracks,
-        selectedClipId: newClip.id,
-        duration: newDuration
+        duration: Math.max(prev.duration, newDuration),
+        selectedClipId: newClip.id
       };
     });
   };
