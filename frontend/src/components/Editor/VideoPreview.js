@@ -96,16 +96,18 @@ const VideoPreview = ({ videoRef, isPlaying, currentTime, duration, tracks, onTi
       }
       
       // Handle different source types
-      if (activeVideo.file) {
-        // For uploaded videos (File objects)
-        const newBlobUrl = URL.createObjectURL(activeVideo.file);
-        setBlobUrl(newBlobUrl);
-        sourceUrl = newBlobUrl;
-        console.log('Created blob URL for uploaded file:', newBlobUrl);
-      } else {
+      if (activeVideo.fileData) {
+        // For uploaded videos with base64 data
+        sourceUrl = activeVideo.fileData;
+        console.log('Using base64 data for video:', activeVideo.name);
+      } else if (activeVideo.src) {
         // For sample videos (URLs)
         sourceUrl = activeVideo.src;
         console.log('Using direct source URL:', sourceUrl);
+      } else {
+        console.error('No valid source found for active video:', activeVideo.name);
+        setPlaybackError(true);
+        return;
       }
       
       // Set up player event handlers
