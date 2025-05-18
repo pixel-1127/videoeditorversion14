@@ -35,8 +35,9 @@
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   flex: 1;
-  z-index: 10; /* Add a lower z-index than the right panel */
-  margin-right: 300px; /* Add right margin to prevent overlap with media library */
+  z-index: 10; /* Lower z-index than the right panel */
+  margin-right: 335px; /* Increased to account for the wider panel (320px + margins) */
+  max-width: calc(100% - 350px); /* Ensure it doesn't go beyond available space */
 }
 
 .video-player {
