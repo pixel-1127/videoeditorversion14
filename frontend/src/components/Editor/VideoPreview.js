@@ -117,7 +117,7 @@ const VideoPreview = ({ videoRef, isPlaying, currentTime, duration, tracks, onTi
         // Set the video source after player is ready
         vjsPlayer.src({
           src: sourceUrl,
-          type: activeVideo.file ? activeVideo.file.type || 'video/mp4' : 'video/mp4'
+          type: activeVideo.fileType || 'video/mp4'
         });
         
         // Set up the videoRef for parent component
