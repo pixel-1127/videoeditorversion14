@@ -13,6 +13,8 @@
   flex: 1;
   overflow: hidden;
   background-color: #121212;
+  position: relative; /* Ensure relative positioning for absolute children */
+  padding-right: 320px; /* Add padding equal to the width of the editor panel */
 }
 
 /* Editor content layout */
